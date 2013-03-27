@@ -1,9 +1,7 @@
 import cv2
-import numpy as np
-from PIL import Image
+import rn
+from memory_profiler import profile
 
-
-OJOS = "/home/Taberu/Tesis/haarcascades/haarcascade_eye.xml"
 
 def capturarVideo():
     camara = cv2.VideoCapture(0)
@@ -27,23 +25,25 @@ def mostrarVideo(nombre,frame):
 
 
 #-----------------------------------------PROCESAR IMAGEN------------------------------
-
+#@profile
 def procesarImagen(frame):
 
     gris = convertirGris(frame)
     noruido = filtroBilateral(gris)
     mejorado = histograma(noruido)
     return mejorado
-    #mostrarVideo("Procesado", mejorado)
 
+#@profile
 def filtroBilateral(frame):
     fb = cv2.bilateralFilter(frame, 0, 32, 2)
     return fb
 
+#@profile
 def convertirGris(frame):
     gris = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     return gris
 
+#@profile
 def histograma(frame):
     #Imagen mejorada por Equalizacion de Histogramas.
     histograma = cv2.equalizeHist(frame)
@@ -63,7 +63,7 @@ def invertir(frame):
 
 #------------------------------------------DETECCION DE CARACTERISTICAS---------------------
 
-def gudfishiurstutrac(frame):
+def goodfeatures(frame):
     #Genera los puntos de seguimineto.
     feature_params = dict( maxCorners = 3000,qualityLevel = 0.1,minDistance = 2,blockSize = 1)
     features = cv2.goodFeaturesToTrack(frame, **feature_params)
@@ -76,7 +76,7 @@ def gudfishiurstutrac(frame):
 #-------------------------------------DETECCION Y RECONOCIMIENTO FACIAL Y OJOS------------------
 
 
-
+#@profile
 def deteccionFacial(frame, gris):
 
     # load detection file (various files for different views and uses)
@@ -110,6 +110,7 @@ def deteccionOjos(frame, gris):
     for x,y, width,height in rectangulos:
         return cv2.rectangle(frame, (x,y), (x+width, y+height), (255,0,0), 1)
 
+#@profile
 def deteccionBoca(frame, gris):
     boca = cv2.CascadeClassifier('/home/taberu/Tesis/haarcascades/haarcascade_mcs_mouth.xml')
 
@@ -120,7 +121,7 @@ def deteccionBoca(frame, gris):
     for x,y, width,height in rectangulos:
         return cv2.rectangle(frame, (x,y), (x+width, y+height), (255,0,0), 1)
 
-
+#@profile
 def deteccionOjoIzquierdo(frame, gris):
     ojo_izq = cv2.CascadeClassifier('/home/taberu/Tesis/haarcascades/haarcascade_lefteye_2splits.xml')
 
@@ -132,7 +133,7 @@ def deteccionOjoIzquierdo(frame, gris):
         return cv2.rectangle(frame, (x,y), (x+width, y+height), (255,0,0), 1)
 
 
-
+#@profile
 def deteccionOjoDerecho(frame, gris):
     # load detection file (various files for different views and uses)
     ojo_der = cv2.CascadeClassifier('/home/taberu/Tesis/haarcascades/haarcascade_righteye_2splits.xml')
@@ -147,35 +148,37 @@ def deteccionOjoDerecho(frame, gris):
 
 
 
-#------------------------------------------------SISTEMA DE ALARMA----------------------------------
-
-def redNeuronal():
-    pass
-def alarma():
-    pass
-
 def main():
+
     camara = capturarVideo()
-    print(camara)
+
+    #Crear Red Neuronal
+    #red = rn.crearRN()
 
     while True:
+        #Obtener Video
         val, frame = obtenerVideo(camara)
 
-        nombreOriginal = "Reconocimiento del Estado Facial de Somnolencia"
+        #Procesar imagenes del video
         improcesada = procesarImagen(frame)
+
+        #Deteccion
         deteccionFacial(frame, improcesada)
-        #deteccionOjos(frame, mejorada)
         deteccionOjoIzquierdo(frame, improcesada)
         deteccionOjoDerecho(frame, improcesada)
-        mostrarVideo(nombreOriginal,frame)
-        #mostrarVideo("Procesada",improcesada)
 
-        #deteccionCirculos(frame, mejorada)
-        #deteccionPupilas(improcesada)
+        #Estimular la Red Neuronal
+        #rn.estimularRN(red,df)
+
+        #Mostrar Resultados
+        nombreOriginal = "Reconocimiento del Estado Facial de Somnolencia"
+        mostrarVideo(nombreOriginal,frame)
+
         key = cv2.waitKey(10)
         if key==27:
           break
           camara.release()
+
 
 if __name__ == "__main__":
     main()
