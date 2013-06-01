@@ -6,6 +6,7 @@ import video as v
 
 
 def main():
+    """Es la clase principal en el cual se sigue la secuencia del procesamiento"""
 
     camara = v.capturarVideo()
 
@@ -19,10 +20,12 @@ def main():
         #Procesar imagenes del video
         improcesada = pi.procesarImagen(frame)
 
+
         #Deteccion
         d.deteccionFacial(frame, improcesada)
-        d.deteccionOjoIzquierdo(frame, improcesada)
-        d.deteccionOjoDerecho(frame, improcesada)
+        #d.deteccionOjoIzquierdo(frame, improcesada)
+        #d.deteccionOjoDerecho(frame, improcesada)
+        #d.goodfeatures(improcesada)
 
         #Estimular la Red Neuronal
         #rn.estimularRN(red,df)
