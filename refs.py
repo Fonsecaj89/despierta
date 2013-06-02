@@ -1,17 +1,43 @@
+# -*- coding: utf-8 -*-
+import os
 import cv2
 import deteccion as d
 import procesarImagen as pi
 import redneuronal as rn
 import video as v
+import entrenar as e
+from alarma import Alarma
+from pybrain.tools.xml.networkreader import NetworkReader
 
 
 def main():
     """Es la clase principal en el cual se sigue la secuencia del procesamiento"""
 
-    camara = v.capturarVideo()
+    a = Alarma()
 
     #Crear Red Neuronal
-    #red = rn.crearRN()
+    red1 = rn.crearRN()
+    red2 = rn.crearRN()
+
+    #Se verifica si el archivo xml que contiene la red neuronal entrenada existe
+    path = os.path.dirname(__file__)
+
+    if os.path.isfile(path + '/rna_somnolencia.xml'):
+        red_somnolencia = NetworkReader.readFrom('rna_somnolencia.xml')
+    else:
+        e.entrenarSomnolencia(red1)
+        red_somnolencia = NetworkReader.readFrom('rna_somnolencia.xml')
+
+    if os.path.isfile(path + '/rna_ojos.xml'):
+        red_ojos = NetworkReader.readFrom('rna_ojos.xml')
+    else:
+        e.entrenarOjos(red2)
+        red_ojos = NetworkReader.readFrom('rna_ojos.xml')
+
+
+    #Se la camara con la que se va a trabajar
+    camara = v.capturarVideo()
+
 
     while True:
         #Obtener Video
@@ -22,13 +48,42 @@ def main():
 
 
         #Deteccion
-        d.deteccionFacial(frame, improcesada)
-        #d.deteccionOjoIzquierdo(frame, improcesada)
-        #d.deteccionOjoDerecho(frame, improcesada)
-        #d.goodfeatures(improcesada)
+        cara = d.deteccionFacial(improcesada)
+        ojo_izq = d.deteccionOjoIzquierdo(improcesada)
+        ojo_der = d.deteccionOjoDerecho(improcesada)
 
-        #Estimular la Red Neuronal
-        #rn.estimularRN(red,df)
+
+        """Se ingresan los valores resultantes de las detecciones a las redes neuronales,
+           en caso de no haber ninguna deteccion, se generara una alarma"""
+
+        if cara == None:
+            """Si el sistema no encuentra ninguna cara debera generar una notificacion de sonido
+               para avisar que hay algun problema"""
+            a.deteccionNula()
+        else:
+            print "Somnolencia", rn.estimularRN(red_somnolencia,cara.flatten())
+
+        if ojo_izq == None:
+            """Si el sistema no encuentra ninguna cara debera generar una notificacion de sonido
+               para avisar que hay algun problema"""
+            a.deteccionNula()
+        else:
+            print "Ojo izquierdo", rn.estimularRN(red_ojos,ojo_izq.flatten())
+
+        if ojo_der == None:
+            """Si el sistema no encuentra ninguna cara debera generar una notificacion de sonido
+               para avisar que hay algun problema"""
+            a.deteccionNula()
+        else:
+            print "Ojo derecho", rn.estimularRN(red_ojos,ojo_der.flatten())
+
+
+
+        """Se ingresan los valores obtenidos al bloque difusor el cual generara las
+           alarmas en los casos que convengan."""
+
+
+
 
         #Mostrar Resultados
         nombreOriginal = "Reconocimiento del Estado Facial de Somnolencia"

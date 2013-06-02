@@ -13,7 +13,6 @@ def procesarImagen(frame):
     gris = convertirGris(frame)
     noruido = filtroBilateral(gris)
     mejorado = histograma(noruido)
-    v.mostrarVideo("frame",mejorado)
     return mejorado
 
 
@@ -47,7 +46,7 @@ def generarAdaptiveThreshold(gris):
 
 def generarThresholdBin(inv):
     """Segmenta la imagen por grupo de colores convirtiendolas en blanco y negro."""
-    tval, thresh = cv2.threshold(inv, 200, 255, cv2.THRESH_BINARY)
+    tval, thresh = cv2.threshold(inv, 220, 255, cv2.THRESH_BINARY)
     return thresh
 
 def invertir(frame):

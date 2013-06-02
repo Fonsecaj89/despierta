@@ -7,7 +7,7 @@ def crearRN():
     n = FeedForwardNetwork()
 
     #Se declaran las laminas de entrada, las laminas escondidas y las de salida de la red neuronal
-    inLayer = LinearLayer(2)
+    inLayer = LinearLayer(4096)
     hiddenLayer = SigmoidLayer(3)
     outLayer = LinearLayer(1)
 
@@ -33,7 +33,8 @@ def crearRN():
 def estimularRN(rn,matriz):
     """Se estimula la red neuronal, es decir, se ingresan los datos a ser procesados, en este caso
        es la imagen recortada de las areas que se desea estudiar"""
-    rn.activate(matriz)
+    if matriz == None:
+        pass
+    else:
+        return rn.activate(matriz)
 
-
-"""FALTA REESTRUCTURAR Y PROBAR"""
