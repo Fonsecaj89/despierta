@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import cv2
-import deteccion as d
+import paralelo as p
 import procesarImagen as pi
 import redneuronal as rn
 import video as v
@@ -47,37 +47,25 @@ def main():
         improcesada = pi.procesarImagen(frame)
 
 
-        #Deteccion
-        cara = d.deteccionFacial(improcesada)
-        ojo_izq = d.deteccionOjoIzquierdo(improcesada)
-        ojo_der = d.deteccionOjoDerecho(improcesada)
+        """Se ingresan a los hilos los parametros de la imagen procesada, la red neuronal
+           y la alarma para que el sistema procese los módulos paralelamente y así poder
+           mejorar los tiempos de reacción al estado de somnolencia. Luego se inicializa
+           el hilo"""
 
+        hilo_cara = p.hiloCara(improcesada,red1,a)
+        hilo_cara.start()
 
-        """Se ingresan los valores resultantes de las detecciones a las redes neuronales,
-           en caso de no haber ninguna deteccion, se generara una alarma"""
+        hilo_ojoiz = p.hiloOjoIz(improcesada,red2,a)
+        hilo_ojoiz.start()
 
-        if cara == None:
-            """Si el sistema no encuentra ninguna cara debera generar una notificacion de sonido
-               para avisar que hay algun problema"""
-            a.deteccionNula()
-        else:
-            print "Somnolencia", rn.estimularRN(red_somnolencia,cara.flatten())
+        hilo_ojode = p.hiloOjoDe(improcesada,red2,a)
+        hilo_ojode.start()
 
-        if ojo_izq == None:
-            """Si el sistema no encuentra ninguna cara debera generar una notificacion de sonido
-               para avisar que hay algun problema"""
-            a.deteccionNula()
-        else:
-            print "Ojo izquierdo", rn.estimularRN(red_ojos,ojo_izq.flatten())
-
-        if ojo_der == None:
-            """Si el sistema no encuentra ninguna cara debera generar una notificacion de sonido
-               para avisar que hay algun problema"""
-            a.deteccionNula()
-        else:
-            print "Ojo derecho", rn.estimularRN(red_ojos,ojo_der.flatten())
-
-
+        """Obtenemos los valores de cada variable para ser procesados por el sistema de
+           alarmas"""
+        res_cara = hilo_cara.join()
+        res_ojoiz = hilo_ojoiz.join()
+        res_ojode = hilo_ojode.join()
 
         """Se ingresan los valores obtenidos al bloque difusor el cual generara las
            alarmas en los casos que convengan."""
