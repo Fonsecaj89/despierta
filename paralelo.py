@@ -9,6 +9,7 @@ class hiloCara(threading.Thread):
          self.alarma = alarma
          self.red = red
          self.imagen = imagen
+         self.resultado = None
 
      def run(self):
          cara = d.deteccionFacial(self.imagen)
@@ -17,7 +18,9 @@ class hiloCara(threading.Thread):
                para avisar que hay algun problema"""
             self.alarma.deteccionNula()
          else:
-             return rn.estimularRN(self.red,cara.flatten())
+             print "cara"
+             self.resultado = rn.estimularRN(self.red,cara.flatten())
+             return self.resultado
 
 
 class hiloOjoIz(threading.Thread):
@@ -26,6 +29,7 @@ class hiloOjoIz(threading.Thread):
          self.alarma = alarma
          self.red = red
          self.imagen = imagen
+         self.resultado = None
 
      def run(self):
          ojo_izq = d.deteccionOjoIzquierdo(self.imagen)
@@ -34,7 +38,9 @@ class hiloOjoIz(threading.Thread):
                para avisar que hay algun problema"""
             self.alarma.deteccionNula()
          else:
-             return rn.estimularRN(self.red,ojo_izq.flatten())
+             print "ojo izquierdo"
+             self.resultado = rn.estimularRN(self.red,ojo_izq.flatten())
+             return self.resultado
 
 
 class hiloOjoDe(threading.Thread):
@@ -43,6 +49,7 @@ class hiloOjoDe(threading.Thread):
          self.alarma = alarma
          self.red = red
          self.imagen = imagen
+         self.resultado = None
 
      def run(self):
          ojo_der = d.deteccionOjoDerecho(self.imagen)
@@ -51,5 +58,7 @@ class hiloOjoDe(threading.Thread):
                para avisar que hay algun problema"""
             self.alarma.deteccionNula()
          else:
-             return rn.estimularRN(self.red,ojo_der.flatten())
+             print "ojo derecho"
+             self.resultado = rn.estimularRN(self.red,ojo_der.flatten())
+             return self.resultado
 

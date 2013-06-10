@@ -27,7 +27,10 @@ def filtroBilateral(frame):
 #@profile
 def convertirGris(frame):
     """Convierte la imagen a color a escala de grises"""
-    gris = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    try:
+        gris = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    except:
+        gris = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
     return gris
 
 #@profile

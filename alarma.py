@@ -13,48 +13,49 @@ class Alarma:
 
 
     def iniBloqueDifusor(self):
-        self.somnolencia = ld.declararConjunto("Somnolencia",0.00,1.00)
+        self.somnolencia = ld.declararConjunto("Somnolencia",0.00,10.00)
         ld.variableLinguistica(self.somnolencia,"Pocas")
         ld.variableLinguistica(self.somnolencia,"Intermedias")
-        ld.variableLinguistica(self.somnolencia,"Muchas")
+        ld.variableLinguistica(self.somnolencia,"Dormido")
 
-        ld.asignarFuncionPertenencia(self.somnolencia,0,"Triangular",(0.00,0.250,0.500))
-        ld.asignarFuncionPertenencia(self.somnolencia,1,"Triangular",(0.251,0.501,0.750))
-        ld.asignarFuncionPertenencia(self.somnolencia,2,"Triangular",(0.502,0.751,0.100))
+        ld.asignarFuncionPertenencia(self.somnolencia,0,"Triangular",(0.00,02.50,05.00))
+        ld.asignarFuncionPertenencia(self.somnolencia,1,"Triangular",(02.51,05.01,07.50))
+        ld.asignarFuncionPertenencia(self.somnolencia,2,"Triangular",(05.02,07.51,10.00))
 
 
-        self.atencion = ld.declararConjunto("Atento",0.00,1.00)
+        self.atencion = ld.declararConjunto("Atento",0.00,10.00)
         ld.variableLinguistica(self.atencion,"Poco")
         ld.variableLinguistica(self.atencion,"Moderado")
-        ld.variableLinguistica(self.atencion,"Excesivo")
+        ld.variableLinguistica(self.atencion,"Atento")
 
-        ld.asignarFuncionPertenencia(self.atencion,0,"Triangular",(0.00,0.250,0.500))
-        ld.asignarFuncionPertenencia(self.atencion,1,"Triangular",(0.251,0.501,0.750))
-        ld.asignarFuncionPertenencia(self.atencion,2,"Triangular",(0.502,0.751,0.100))
-
-
-
-        self.estado = ld.declararConjunto("Estado",0.0,0.4)
-        ld.variableLinguistica(self.estado,"Poco")
-        ld.variableLinguistica(self.estado,"Moderado")
-        ld.variableLinguistica(self.estado,"Mucho")
-
-        ld.asignarFuncionPertenencia(self.estado,0,"Triangular",(0,1,2))
-        ld.asignarFuncionPertenencia(self.estado,1,"Triangular",(1.01,2.01,3))
-        ld.asignarFuncionPertenencia(self.estado,2,"Triangular",(2.02,3.01,4))
+        ld.asignarFuncionPertenencia(self.atencion,0,"Triangular",(0.00,02.50,05.00))
+        ld.asignarFuncionPertenencia(self.atencion,1,"Triangular",(02.51,05.01,07.50))
+        ld.asignarFuncionPertenencia(self.atencion,2,"Triangular",(05.02,07.51,10.00))
 
 
-        #ld.crearReglas(self.reglas,"if Calorias_Quemadas is Pocas and Sudor_Perdido is Poco then Liquido is Poco")
-        #ld.crearReglas(self.reglas,"if Calorias_Quemadas is Intermedias and Sudor_Perdido is Poco then Liquido is Poco")
-        #ld.crearReglas(self.reglas,"if Calorias_Quemadas is Muchas and Sudor_Perdido is Poco then Liquido is Moderado")
+        self.estado = ld.declararConjunto("Estado",0.00,5.00)
+        ld.variableLinguistica(self.estado,"Atento")
+        ld.variableLinguistica(self.estado,"Distraido")
+        ld.variableLinguistica(self.estado,"Somnoliento")
+        ld.variableLinguistica(self.estado,"Dormido")
 
-        #ld.crearReglas(self.reglas,"if Calorias_Quemadas is Pocas and Sudor_Perdido is Moderado then Liquido is Poco")
-        #ld.crearReglas(self.reglas,"if Calorias_Quemadas is Intermedias and Sudor_Perdido is Moderado then Liquido is Moderado")
-        #ld.crearReglas(self.reglas,"if Calorias_Quemadas is Muchas and Sudor_Perdido is Moderado then Liquido is Moderado")
+        ld.asignarFuncionPertenencia(self.estado,0,"Triangular",(0.00,1.00,2.00))
+        ld.asignarFuncionPertenencia(self.estado,1,"Triangular",(1.01,2.01,3.00))
+        ld.asignarFuncionPertenencia(self.estado,2,"Triangular",(2.02,3.01,4.00))
+        ld.asignarFuncionPertenencia(self.estado,3,"Triangular",(3.02,4.01,5.00))
 
-        #ld.crearReglas(self.reglas,"if Calorias_Quemadas is Pocas and Sudor_Perdido is Excesivo then Liquido is Moderado")
-        #ld.crearReglas(self.reglas,"if Calorias_Quemadas is Intermedias and Sudor_Perdido is Excesivo then Liquido is Mucho")
-        #ld.crearReglas(self.reglas,"if Calorias_Quemadas is Muchas and Sudor_Perdido is Excesivo then Liquido is Mucho")
+
+        ld.crearReglas(self.reglas,"if Somnolencia is Pocas and Atento is Poco then Estado is Distraido")
+        ld.crearReglas(self.reglas,"if Somnolencia is Intermedias and Atento is Poco then Estado is Distraido")
+        ld.crearReglas(self.reglas,"if Somnolencia is Dormido and Atento is Poco then Estado is Dormido")
+
+        ld.crearReglas(self.reglas,"if Somnolencia is Pocas and Atento is Moderado then Estado is Distraido")
+        ld.crearReglas(self.reglas,"if Somnolencia is Intermedias and Atento is Moderado then Estado is Somnoliento")
+        ld.crearReglas(self.reglas,"if Somnolencia is Dormido and Atento is Moderado then Estado is Dormido")
+
+        ld.crearReglas(self.reglas,"if Somnolencia is Pocas and Atento is Atento then Estado is Atento")
+        ld.crearReglas(self.reglas,"if Somnolencia is Intermedias and Atento is Atento then Estado is Somnoliento")
+        ld.crearReglas(self.reglas,"if Somnolencia is Dormido and Atento is Atento then Estado is Dormido")
 
     def motorDifuso(self,Somnolencia,Atencion):
         fsomnolencia = ld.fusificar(Somnolencia,self.somnolencia)
@@ -68,7 +69,10 @@ class Alarma:
         resultado = ld.procesar(self.reglas,motor,self.estado)
         return resultado
 
-    def alertar():
+    def alertar(self):
+        pass
+
+    def noCamara(self):
         pass
 
     def deteccionNula(self):

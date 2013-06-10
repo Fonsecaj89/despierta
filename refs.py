@@ -3,6 +3,7 @@ import os
 import cv2
 import paralelo as p
 import procesarImagen as pi
+import deteccion as d
 import redneuronal as rn
 import video as v
 import entrenar as e
@@ -18,6 +19,7 @@ def main():
     #Crear Red Neuronal
     red1 = rn.crearRN()
     red2 = rn.crearRN()
+    red3 = rn.crearRN()
 
     #Se verifica si el archivo xml que contiene la red neuronal entrenada existe
     path = os.path.dirname(__file__)
@@ -28,15 +30,24 @@ def main():
         e.entrenarSomnolencia(red1)
         red_somnolencia = NetworkReader.readFrom('rna_somnolencia.xml')
 
-    if os.path.isfile(path + '/rna_ojos.xml'):
-        red_ojos = NetworkReader.readFrom('rna_ojos.xml')
+    if os.path.isfile(path + '/rna_atento.xml'):
+        red_atento = NetworkReader.readFrom('rna_atento.xml')
     else:
-        e.entrenarOjos(red2)
-        red_ojos = NetworkReader.readFrom('rna_ojos.xml')
+        e.entrenarAtento(red2)
+        red_atento = NetworkReader.readFrom('rna_atento.xml')
+
+    #if os.path.isfile(path + '/rna_ojos.xml'):
+        #red_ojos = NetworkReader.readFrom('rna_ojos.xml')
+    #else:
+        #e.entrenarOjos(red3)
+        #red_ojos = NetworkReader.readFrom('rna_ojos.xml')
 
 
     #Se la camara con la que se va a trabajar
-    camara = v.capturarVideo()
+    try:
+        camara = v.capturarVideo()
+    except:
+        a.noCamara()
 
 
     while True:
@@ -47,28 +58,58 @@ def main():
         improcesada = pi.procesarImagen(frame)
 
 
-        """Se ingresan a los hilos los parametros de la imagen procesada, la red neuronal
-           y la alarma para que el sistema procese los módulos paralelamente y así poder
-           mejorar los tiempos de reacción al estado de somnolencia. Luego se inicializa
-           el hilo"""
+        """Se detecta la cara del video, luego se activa las redes neuronales para detectar
+           los estados de somnolencia y atencion en el conductor"""
 
-        hilo_cara = p.hiloCara(improcesada,red1,a)
-        hilo_cara.start()
 
-        hilo_ojoiz = p.hiloOjoIz(improcesada,red2,a)
-        hilo_ojoiz.start()
+        cara = d.deteccionFacial(improcesada)
+        if cara == None:
+            """Si el sistema no encuentra ninguna cara debera generar una notificacion de sonido
+               para avisar que hay algun problema"""
+            a.deteccionNula()
+        else:
 
-        hilo_ojode = p.hiloOjoDe(improcesada,red2,a)
-        hilo_ojode.start()
+            Somnolencia = rn.estimularRN(red_somnolencia,cara.flatten())
+            Atencion = rn.estimularRN(red_atento,cara.flatten())
+            print "somnolencia", Somnolencia, "atento", Atencion
 
-        """Obtenemos los valores de cada variable para ser procesados por el sistema de
-           alarmas"""
-        res_cara = hilo_cara.join()
-        res_ojoiz = hilo_ojoiz.join()
-        res_ojode = hilo_ojode.join()
+        #ojo_izq = d.deteccionOjoIzquierdo(improcesada)
+        #if ojo_izq == None:
+           #"""Si el sistema no encuentra ninguna cara debera generar una notificacion de sonido
+              #para avisar que hay algun problema"""
+           #a.deteccionNula()
+        #else:
+            #resultado = rn.estimularRN(red_ojos,ojo_izq.flatten())
+            #print "ojo izquierdo", resultado
+
+        #ojo_der = d.deteccionOjoDerecho(improcesada)
+        #if ojo_der == None:
+           #"""Si el sistema no encuentra ninguna cara debera generar una notificacion de sonido
+              #para avisar que hay algun problema"""
+           #a.deteccionNula()
+        #else:
+            #resultado = rn.estimularRN(red_ojos,ojo_der.flatten())
+            #print "ojo derecho", resultado
+
+
+        #hilo_cara = p.hiloCara(improcesada,red1,a)
+        #hilo_cara.start()
+        #res_cara = hilo_cara.join()
+        #resultado = hilo_cara.resultado
+        #print res_cara, resultado
+
+        #hilo_ojoiz = p.hiloOjoIz(improcesada,red2,a)
+        #hilo_ojoiz.start()
+        #res_ojoiz = hilo_ojoiz.join()
+
+        #hilo_ojode = p.hiloOjoDe(improcesada,red2,a)
+        #hilo_ojode.start()
+        #res_ojode = hilo_ojode.join()
+
 
         """Se ingresan los valores obtenidos al bloque difusor el cual generara las
            alarmas en los casos que convengan."""
+        a.motorDifuso(Somnolencia,Atencion)
 
 
 
