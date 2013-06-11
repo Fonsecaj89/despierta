@@ -34,7 +34,7 @@ def estimularRN(rn,matriz):
     """Se estimula la red neuronal, es decir, se ingresan los datos a ser procesados, en este caso
        es la imagen recortada de las areas que se desea estudiar"""
     if matriz == None:
-        pass
+        return None
     else:
         return rn.activate(matriz)
 
