@@ -14,6 +14,9 @@ def main():
     """Es la clase principal en el cual se sigue la secuencia del procesamiento"""
 
     a = Alarma()
+    """Al inicializar genera un sonido inidicado queel dispositivo esa funcionando
+    sin contratiempos"""
+    a.inicio()
 
     #Crear Red Neuronal
     red1 = rn.crearRN()
@@ -65,7 +68,8 @@ def main():
 
         """Se ingresan los valores obtenidos al bloque difusor el cual generara las
            alarmas en los casos que convengan."""
-        a.motorDifuso(Somnolencia,Atencion)
+        estado = a.motorDifuso(Somnolencia,Atencion)
+        a.alertar(estado)
 
         #Mostrar Resultados
         nombreOriginal = "Reconocimiento del Estado Facial de Somnolencia"

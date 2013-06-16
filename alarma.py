@@ -8,6 +8,8 @@ class Alarma:
         self.somnolencia = ""
         self.atencion = ""
         self.estado = ""
+        self.esres = ""
+        self.aux = False
         self.reglas = ld.iniReglas()
         self.iniBloqueDifusor()
 
@@ -69,21 +71,48 @@ class Alarma:
         resultado = ld.procesar(self.reglas,motor,self.estado)
         return resultado
 
-    def alertar(self):
-        pass
+    def alertar(self,resultado):
+        estado, val = resultado
+
+        if not self.aux:
+            self.aux = True
+        else:
+            if estado == "Distraido":
+                self.distraido()
+            if estado == "Somnoliento":
+                self.somnoliento()
+            if estado == "Dormido":
+                self.somnoliento()
+
 
     def noCamara(self):
-        pass
+        song = pyglet.media.load('error.mp3')
+        song.play()
+        song.on_eos = lambda: pyglet.app.exit()
+        pyglet.app.run()
 
     def deteccionNula(self):
         """Informa al usuario que el sistema no detecta ningun rostro"""
-        #song = pyglet.media.load('directoria del audio')
-        #song.play()
-        #pyglet.app.run()
-        pass
+        song = pyglet.media.load('error.mp3')
+        song.play()
+        song.on_eos = lambda: pyglet.app.exit()
+        pyglet.app.run()
 
     def distraido(self):
-        pass
+        song = pyglet.media.load('a2.mp3')
+        song.play()
+        song.on_eos = lambda: pyglet.app.exit()
+        pyglet.app.run()
 
     def somnoliento(self):
-        pass
+        song = pyglet.media.load('a2-2.mp3')
+        song.play()
+        song.on_eos = lambda: pyglet.app.exit()
+        pyglet.app.run()
+
+    def inicio(self):
+        song = pyglet.media.load('ok.mp3')
+        song.play()
+        song.on_eos = lambda: pyglet.app.exit()
+        pyglet.app.run()
+        print "lista"
