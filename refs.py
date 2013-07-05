@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import time
 import cv2
 import procesarImagen as pi
 import deteccion as d
@@ -45,6 +46,8 @@ def main():
 
 
     while True:
+        Somnolencia = 0.00001
+        Atencion = 0.00001
         #Obtener Video
         val, frame = v.obtenerVideo(camara)
 
@@ -55,30 +58,22 @@ def main():
         """Se detecta la cara del video, luego se activa las redes neuronales para detectar
            los estados de somnolencia y atencion en el conductor"""
 
-
         cara = d.deteccionFacial(improcesada)
         if cara == None:
             """Si el sistema no encuentra ninguna cara debera generar una notificacion de sonido
                para avisar que hay algun problema"""
-            a.deteccionNula()
+            #time.sleep(15)
+            #a.deteccionNula()
         else:
 
             Somnolencia = rn.estimularRN(red_somnolencia,cara.flatten())
             Atencion = rn.estimularRN(red_atento,cara.flatten())
 
-        """Se ingresan los valores obtenidos al bloque difusor el cual generara las
-           alarmas en los casos que convengan."""
-        estado = a.motorDifuso(Somnolencia,Atencion)
-        a.alertar(estado)
-
-        #Mostrar Resultados
-        nombreOriginal = "Reconocimiento del Estado Facial de Somnolencia"
-        v.mostrarVideo(nombreOriginal,frame)
-
-        key = cv2.waitKey(10)
-        if key==27:
-          break
-          camara.release()
+            """Se ingresan los valores obtenidos al bloque difusor el cual generara las
+               alarmas en los casos que convengan."""
+            estado = a.motorDifuso(Somnolencia,Atencion)
+            print "Estado de la alarma", estado
+            a.alertar(estado)
 
 
 if __name__ == "__main__":
